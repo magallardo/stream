@@ -3,7 +3,7 @@ package window
 import (
 	"testing"
 
-	"github.com/project-flogo/stream/activity/aggregate/window/functions"
+	"github.com/magallardo/stream/activity/aggregate/window/functions"
 	"github.com/stretchr/testify/assert"
 )
 

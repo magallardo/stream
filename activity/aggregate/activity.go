@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/magallardo/stream/activity/aggregate/window"
+	"github.com/magallardo/stream/pipeline/support"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/metadata"
-	"github.com/project-flogo/stream/activity/aggregate/window"
-	"github.com/project-flogo/stream/pipeline/support"
 )
 
 const (
@@ -82,6 +82,8 @@ func (a *Activity) Metadata() *activity.Metadata {
 
 // Eval implements api.Activity.Eval - Aggregates the Message
 func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
+
+	ctx.Logger().Info("In Eval function")
 
 	sharedData := ctx.GetSharedTempData()
 	wv, defined := sharedData[sdWindow]

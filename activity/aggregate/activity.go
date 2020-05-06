@@ -63,7 +63,9 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, err
 	}
 
-	act := &Activity{settings: s, additionalSettings: additionalSettings}
+	sharedData := make(map[string]interface{})
+
+	act := &Activity{settings: s, additionalSettings: additionalSettings, sharedData: sharedData}
 
 	return act, nil
 }
@@ -72,6 +74,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 type Activity struct {
 	settings           *Settings
 	additionalSettings map[string]string
+	sharedData         map[string]interface{}
 	mutex              sync.Mutex
 }
 
@@ -83,9 +86,10 @@ func (a *Activity) Metadata() *activity.Metadata {
 // Eval implements api.Activity.Eval - Aggregates the Message
 func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
-	ctx.Logger().Info("In Eval function")
+	ctx.Logger().Debug("In Eval function")
 
-	sharedData := ctx.GetSharedTempData()
+	// sharedData := ctx.GetSharedTempData()
+	sharedData := a.sharedData
 	wv, defined := sharedData[sdWindow]
 
 	timerSupport, timerSupported := support.GetTimerSupport(ctx)
@@ -99,9 +103,11 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		a.mutex.Lock()
 
 		wv, defined = sharedData[sdWindow]
+
 		if defined {
 			w = wv.(window.Window)
 		} else {
+
 			w, err = a.createWindow(ctx)
 
 			if err != nil {
@@ -181,7 +187,8 @@ func (a *Activity) PostEval(ctx activity.Context, userData interface{}) (done bo
 
 func (a *Activity) moveWindow(ctx activity.Context) bool {
 
-	sharedData := ctx.GetSharedTempData()
+	// sharedData := ctx.GetSharedTempData()
+	sharedData := a.sharedData
 
 	wv, _ := sharedData[sdWindow]
 
